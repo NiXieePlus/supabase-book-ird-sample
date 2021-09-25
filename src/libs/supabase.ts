@@ -22,3 +22,24 @@ export const getTitles = async () => {
   }
   return [];
 };
+
+export const getSubtitles = async (id: string) => {
+  let { data, error } = await client
+    .from("manga_title")
+    .select("*")
+    .eq("id", id);
+  if (!error && data) {
+    const title = data[0];
+    ({ data, error } = await client
+      .from("manga_subtitle")
+      .select("*")
+      .order("volume", { ascending: true })
+      .eq("title_id", id));
+    if (!error && data) {
+      return { title: title, subtitles: data };
+    } else {
+      return { title: title, subtitles: null };
+    }
+  }
+  return { title: null, subtitles: null };
+};
