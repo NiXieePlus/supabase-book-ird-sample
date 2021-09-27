@@ -1,22 +1,29 @@
 import { Dialog, Disclosure, Transition } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/solid";
-import { Button, IconEdit, IconSave, IconTrash2, IconX } from "@supabase/ui";
-import { useRouter } from "next/router";
+import { Button, IconSave, IconTrash2, IconX } from "@supabase/ui";
+import Image from "next/image";
+import noImage from "public/no_image.png";
 import { Fragment, useCallback, useState } from "react";
-import { Title } from "src/components/titleList";
+import { subtitle } from "src/components/SubtitleList";
+import { Title } from "src/components/TitleList";
 import { client } from "src/libs/supabase";
 
 type Props = {
+  subtitle: subtitle;
   title: Title;
+  uuid: string;
   getSubtitleList: VoidFunction;
 };
 
-export const EditTitle = (props: Props) => {
+export const SubtitleCard = (props: Props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>(props.title.title);
-  const [author, setAuthor] = useState<string>(props.title.author);
-
-  const router = useRouter();
+  const [volume, setVolume] = useState<string>(
+    props.subtitle.volume.toString()
+  );
+  const [isbn, setIsbn] = useState<string>(props.subtitle.isbn.toString());
+  const [possession, setPossession] = useState<boolean>(
+    props.subtitle.possession
+  );
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -26,51 +33,92 @@ export const EditTitle = (props: Props) => {
     setIsOpen(false);
   }, []);
 
-  const handleSave = useCallback(async () => {
-    if (title == "") {
-      alert("Input title.");
-      return;
-    }
-    const { error } = await client.from("manga_title").upsert([
-      {
-        id: props.title.id,
-        user_id: props.title.user_id,
-        title: title,
-        author: author,
-        image_url: props.title.image_url,
-      },
-    ]);
+  let color = "grayscale";
+  if (props.subtitle.possession) {
+    color = "grayscale-0";
+  }
+
+  const handleSetThumbnail = useCallback(async () => {
+    let title = props.title;
+    title.image_url = props.subtitle.image_url;
+    const { error } = await client.from("manga_title").upsert(title);
     if (error) {
-      alert(error);
-    } else {
-      props.getSubtitleList();
-      closeModal();
+      alert("Failed: Set Thumbnail.");
     }
-  }, [title, props, author, closeModal]);
+    closeModal();
+  }, [props, closeModal]);
 
   const handleRemove = useCallback(async () => {
-    let { error } = await client
+    const { error } = await client
       .from("manga_subtitle")
       .delete()
-      .eq("title_id", props.title.id);
+      .eq("id", props.subtitle.id);
     if (error) {
-      alert(error);
+      alert("Failed: Remove Subtitle.");
     }
-    ({ error } = await client
-      .from("manga_title")
-      .delete()
-      .eq("id", props.title.id));
+    props.getSubtitleList();
+    closeModal();
+  }, [props, closeModal]);
+
+  const handleSave = useCallback(async () => {
+    if (volume == "" || Number(volume) == NaN) {
+      alert("Input volume as an integer.");
+      return;
+    }
+    if (Number(volume) < 0 || Number(volume) % 1 != 0) {
+      alert("Input volume as an integer.");
+      return;
+    }
+    if (isbn == "") {
+      alert("Input ISBN number.");
+      return;
+    }
+    const res = await fetch("https://api.openbd.jp/v1/get?isbn=" + isbn);
+    const openbd = await res.json();
+    if (!openbd) {
+      alert("Could not get the data from openBD.");
+      return;
+    }
+    if (openbd[0] == null) {
+      alert("Invalid ISBN number. Please check.");
+      return;
+    }
+    const imageUrl = "https://cover.openbd.jp/" + isbn + ".jpg";
+    const { error } = await client.from("manga_subtitle").upsert({
+      id: props.subtitle.id,
+      user_id: props.subtitle.user_id,
+      title_id: props.subtitle.title_id,
+      volume: Number(volume),
+      isbn: isbn.replaceAll("-", ""),
+      image_url: imageUrl,
+      possession: possession,
+    });
     if (error) {
-      alert(error);
+      alert("Failed: Save Subtitle.");
     }
-    router.push("/");
-  }, [props, router]);
+    props.getSubtitleList();
+    closeModal();
+  }, [props, volume, isbn, possession, closeModal]);
 
   return (
     <>
-      <Button block size="medium" icon={<IconEdit />} onClick={openModal}>
-        EDIT
-      </Button>
+      <div className="p-2 border cursor-pointer" onClick={openModal}>
+        <div className={color}>
+          <div className="flex justify-center">
+            {props.subtitle.image_url ? (
+              <Image
+                src={props.subtitle.image_url}
+                alt="thumbnail"
+                width={126}
+                height={200}
+              />
+            ) : (
+              <Image src={noImage} alt="thumbnail" width={126} height={200} />
+            )}
+          </div>
+        </div>
+        <div className="mt-2 text-center">({props.subtitle.volume})</div>
+      </div>
 
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog
@@ -99,27 +147,49 @@ export const EditTitle = (props: Props) => {
                   as="h3"
                   className="text-2xl font-medium leading-6 text-center text-gray-900"
                 >
-                  Add Title
+                  Add Subtitle
                 </Dialog.Title>
                 <div className="grid grid-cols-4 gap-2 mt-4">
-                  <div className="col-span-1 text-xl text-center">Title</div>
+                  <div className="col-span-1 pt-1 text-xl text-center">
+                    Volume
+                  </div>
                   <input
                     className="w-full h-10 col-span-3 p-2 bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-700"
-                    value={title}
+                    value={volume}
                     onChange={(e) => {
-                      return setTitle(e.target.value);
+                      return setVolume(e.target.value);
                     }}
                   />
                 </div>
                 <div className="grid grid-cols-4 gap-2 mt-4">
-                  <div className="col-span-1 text-xl text-center">Author</div>
+                  <div className="col-span-1 pt-1 text-xl text-center">
+                    ISBN
+                  </div>
                   <input
                     className="w-full h-10 col-span-3 p-2 bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-700"
-                    value={author}
+                    value={isbn}
                     onChange={(e) => {
-                      return setAuthor(e.target.value);
+                      return setIsbn(e.target.value);
                     }}
                   />
+                </div>
+                <div className="grid grid-cols-5 gap-2 mt-4">
+                  <div className="col-span-2 pt-1 text-xl text-center">
+                    Possession
+                  </div>
+                  <div className="col-span-3 pt-2 pl-2">
+                    <input
+                      type="checkbox"
+                      className="scale-150"
+                      checked={possession}
+                      onChange={() => setPossession(!possession)}
+                    />
+                  </div>
+                </div>
+                <div className="pt-4 mx-4">
+                  <Button block size="medium" onClick={handleSetThumbnail}>
+                    SET TO THUMBNAIL
+                  </Button>
                 </div>
                 <div className="mx-4 mt-4 bg-blue-50">
                   <Disclosure>
@@ -146,7 +216,6 @@ export const EditTitle = (props: Props) => {
                     )}
                   </Disclosure>
                 </div>
-
                 <div className="flex justify-center mt-4">
                   <div className="w-32 p-2">
                     <Button

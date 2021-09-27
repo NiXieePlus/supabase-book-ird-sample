@@ -3,8 +3,8 @@ import { SearchIcon } from "@heroicons/react/outline";
 import { ChevronUpIcon } from "@heroicons/react/solid";
 import { Dispatch, SetStateAction, useCallback, useRef, useState } from "react";
 import { RingLoader } from "react-spinners";
-import { BookList } from "src/components/bookList";
-import { Title } from "src/components/titleList";
+import { BookList } from "src/components/BookList";
+import { Title } from "src/components/TitleList";
 import { bookData } from "src/pages/api/rakuten";
 
 type Props = {

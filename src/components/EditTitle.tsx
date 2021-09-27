@@ -1,29 +1,22 @@
 import { Dialog, Disclosure, Transition } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/solid";
-import { Button, IconSave, IconTrash2, IconX } from "@supabase/ui";
-import Image from "next/image";
-import noImage from "public/no_image.png";
+import { Button, IconEdit, IconSave, IconTrash2, IconX } from "@supabase/ui";
+import { useRouter } from "next/router";
 import { Fragment, useCallback, useState } from "react";
-import { Title } from "src/components/titleList";
+import { Title } from "src/components/TitleList";
 import { client } from "src/libs/supabase";
-import { subtitle } from "src/pages/title";
 
 type Props = {
-  subtitle: subtitle;
   title: Title;
-  uuid: string;
   getSubtitleList: VoidFunction;
 };
 
-export const SubtitleCard = (props: Props) => {
+export const EditTitle = (props: Props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [volume, setVolume] = useState<string>(
-    props.subtitle.volume.toString()
-  );
-  const [isbn, setIsbn] = useState<string>(props.subtitle.isbn.toString());
-  const [possession, setPossession] = useState<boolean>(
-    props.subtitle.possession
-  );
+  const [title, setTitle] = useState<string>(props.title.title);
+  const [author, setAuthor] = useState<string>(props.title.author);
+
+  const router = useRouter();
 
   const openModal = useCallback(() => {
     setIsOpen(true);
@@ -33,92 +26,51 @@ export const SubtitleCard = (props: Props) => {
     setIsOpen(false);
   }, []);
 
-  let color = "grayscale";
-  if (props.subtitle.possession) {
-    color = "grayscale-0";
-  }
-
-  const handleSetThumbnail = useCallback(async () => {
-    let title = props.title;
-    title.image_url = props.subtitle.image_url;
-    const { error } = await client.from("manga_title").upsert(title);
-    if (error) {
-      alert(error);
+  const handleSave = useCallback(async () => {
+    if (title == "") {
+      alert("Input Title.");
+      return;
     }
-    closeModal();
-  }, [props, closeModal]);
+    const { error } = await client.from("manga_title").upsert([
+      {
+        id: props.title.id,
+        user_id: props.title.user_id,
+        title: title,
+        author: author,
+        image_url: props.title.image_url,
+      },
+    ]);
+    if (error) {
+      alert("Failed: Save Title.");
+    } else {
+      props.getSubtitleList();
+      closeModal();
+    }
+  }, [title, props, author, closeModal]);
 
   const handleRemove = useCallback(async () => {
-    const { error } = await client
+    let { error } = await client
       .from("manga_subtitle")
       .delete()
-      .eq("id", props.subtitle.id);
+      .eq("title_id", props.title.id);
     if (error) {
-      alert(error);
+      alert("Failed: Remove Title.");
     }
-    props.getSubtitleList();
-    closeModal();
-  }, [props, closeModal]);
-
-  const handleSave = useCallback(async () => {
-    if (volume == "" || Number(volume) == NaN) {
-      alert("Input volume as an integer.");
-      return;
-    }
-    if (Number(volume) < 0 || Number(volume) % 1 != 0) {
-      alert("Input volume as an integer.");
-      return;
-    }
-    if (isbn == "") {
-      alert("Input ISBN number.");
-      return;
-    }
-    const res = await fetch("https://api.openbd.jp/v1/get?isbn=" + isbn);
-    const openbd = await res.json();
-    if (!openbd) {
-      alert("Could not get the data from openBD.");
-      return;
-    }
-    if (openbd[0] == null) {
-      alert("Invalid ISBN number. Please check.");
-      return;
-    }
-    const imageUrl = "https://cover.openbd.jp/" + isbn + ".jpg";
-    const { error } = await client.from("manga_subtitle").upsert({
-      id: props.subtitle.id,
-      user_id: props.subtitle.user_id,
-      title_id: props.subtitle.title_id,
-      volume: Number(volume),
-      isbn: isbn.replaceAll("-", ""),
-      image_url: imageUrl,
-      possession: possession,
-    });
+    ({ error } = await client
+      .from("manga_title")
+      .delete()
+      .eq("id", props.title.id));
     if (error) {
-      alert(error);
+      alert("Failed: Remove Title.");
     }
-    props.getSubtitleList();
-    closeModal();
-  }, [props, volume, isbn, possession, closeModal]);
+    router.push("/");
+  }, [props, router]);
 
   return (
     <>
-      <div className="p-2 border cursor-pointer" onClick={openModal}>
-        <div className={color}>
-          <div className="flex justify-center">
-            {props.subtitle.image_url ? (
-              <Image
-                src={props.subtitle.image_url}
-                alt="thumbnail"
-                width={126}
-                height={200}
-              />
-            ) : (
-              <Image src={noImage} alt="thumbnail" width={126} height={200} />
-            )}
-          </div>
-        </div>
-        <div className="mt-2 text-center">({props.subtitle.volume})</div>
-      </div>
+      <Button block size="medium" icon={<IconEdit />} onClick={openModal}>
+        Edit
+      </Button>
 
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog
@@ -147,49 +99,27 @@ export const SubtitleCard = (props: Props) => {
                   as="h3"
                   className="text-2xl font-medium leading-6 text-center text-gray-900"
                 >
-                  Add Subtitle
+                  Add Title
                 </Dialog.Title>
                 <div className="grid grid-cols-4 gap-2 mt-4">
-                  <div className="col-span-1 pt-1 text-xl text-center">
-                    Volume
-                  </div>
+                  <div className="col-span-1 text-xl text-center">Title</div>
                   <input
                     className="w-full h-10 col-span-3 p-2 bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-700"
-                    value={volume}
+                    value={title}
                     onChange={(e) => {
-                      return setVolume(e.target.value);
+                      return setTitle(e.target.value);
                     }}
                   />
                 </div>
                 <div className="grid grid-cols-4 gap-2 mt-4">
-                  <div className="col-span-1 pt-1 text-xl text-center">
-                    ISBN
-                  </div>
+                  <div className="col-span-1 text-xl text-center">Author</div>
                   <input
                     className="w-full h-10 col-span-3 p-2 bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-700"
-                    value={isbn}
+                    value={author}
                     onChange={(e) => {
-                      return setIsbn(e.target.value);
+                      return setAuthor(e.target.value);
                     }}
                   />
-                </div>
-                <div className="grid grid-cols-5 gap-2 mt-4">
-                  <div className="col-span-2 pt-1 text-xl text-center">
-                    Possession
-                  </div>
-                  <div className="col-span-3 pt-2 pl-2">
-                    <input
-                      type="checkbox"
-                      className="scale-150"
-                      checked={possession}
-                      onChange={() => setPossession(!possession)}
-                    />
-                  </div>
-                </div>
-                <div className="pt-4 mx-4">
-                  <Button block size="medium" onClick={handleSetThumbnail}>
-                    SET TO THUMBNAIL
-                  </Button>
                 </div>
                 <div className="mx-4 mt-4 bg-blue-50">
                   <Disclosure>
@@ -216,6 +146,7 @@ export const SubtitleCard = (props: Props) => {
                     )}
                   </Disclosure>
                 </div>
+
                 <div className="flex justify-center mt-4">
                   <div className="w-32 p-2">
                     <Button

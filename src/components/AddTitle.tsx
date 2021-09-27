@@ -3,72 +3,48 @@ import { Button, IconPlus, IconX } from "@supabase/ui";
 import Image from "next/image";
 import add from "public/add.png";
 import { Fragment, useCallback, useState } from "react";
-import { SearchSubtitle } from "src/components/searchSubtitle";
-import { Title } from "src/components/titleList";
 import { client } from "src/libs/supabase";
 
 type Props = {
-  title: Title;
   uuid: string;
-  getSubtitleList: VoidFunction;
+  getTitleList: VoidFunction;
 };
 
-export const AddSubtitle = (props: Props) => {
+export const AddTitle = (props: Props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [volume, setVolume] = useState<string>("");
-  const [isbn, setIsbn] = useState<string>("");
-  const [possession, setPossession] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>("");
+  const [author, setAuthor] = useState<string>("");
 
   const openModal = useCallback(() => {
     setIsOpen(true);
   }, []);
 
   const closeModal = useCallback(() => {
-    setVolume("");
-    setIsbn("");
-    setPossession(false);
+    setTitle("");
+    setAuthor("");
     setIsOpen(false);
   }, []);
 
-  const handleAdd = useCallback(async () => {
-    if (volume == "" || Number(volume) == NaN) {
-      alert("Input volume as an integer.");
-      return;
-    }
-    if (Number(volume) < 0 || Number(volume) % 1 != 0) {
-      alert("Input volume as an integer.");
-      return;
-    }
-    if (isbn == "") {
-      alert("Input ISBN number.");
-      return;
-    }
-    const res = await fetch("https://api.openbd.jp/v1/get?isbn=" + isbn);
-    const openbd = await res.json();
-    if (openbd[0] == null) {
-      alert("Invalid ISBN number. Please check.");
-      return;
-    }
-    const imageUrl = "https://cover.openbd.jp/" + isbn + ".jpg";
-    const { data, error } = await client.from("manga_subtitle").insert([
-      {
-        user_id: props.uuid,
-        title_id: props.title.id,
-        volume: Number(volume),
-        isbn: isbn.replaceAll("-", ""),
-        image_url: imageUrl,
-        possession: possession,
-      },
-    ]);
-    if (error) {
-      alert(error);
-    } else {
-      if (data) {
-        props.getSubtitleList();
-        closeModal();
+  const handleAdd = useCallback(
+    async (uuid: string) => {
+      if (title == "") {
+        alert("Input Title.");
+        return;
       }
-    }
-  }, [props, volume, isbn, possession, closeModal]);
+      const { data, error } = await client
+        .from("manga_title")
+        .insert([{ user_id: uuid, title: title, author: author }]);
+      if (error) {
+        alert("Failed: Add Title.");
+      } else {
+        if (data) {
+          props.getTitleList();
+          closeModal();
+        }
+      }
+    },
+    [title, author, props, closeModal]
+  );
 
   return (
     <>
@@ -106,45 +82,27 @@ export const AddSubtitle = (props: Props) => {
                   as="h3"
                   className="text-2xl font-medium leading-6 text-center text-gray-900"
                 >
-                  Add Subtitle
+                  Add Title
                 </Dialog.Title>
                 <div className="grid grid-cols-4 gap-2 mt-4">
-                  <div className="col-span-1 pt-1 text-xl text-center">
-                    Volume
-                  </div>
+                  <div className="col-span-1 text-xl text-center">Title</div>
                   <input
                     className="w-full h-10 col-span-3 p-2 bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-700"
-                    value={volume}
+                    value={title}
                     onChange={(e) => {
-                      return setVolume(e.target.value);
+                      return setTitle(e.target.value);
                     }}
                   />
                 </div>
                 <div className="grid grid-cols-4 gap-2 mt-4">
-                  <div className="col-span-1 pt-1 text-xl text-center">
-                    ISBN
-                  </div>
+                  <div className="col-span-1 text-xl text-center">Author</div>
                   <input
                     className="w-full h-10 col-span-3 p-2 bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-700"
-                    value={isbn}
+                    value={author}
                     onChange={(e) => {
-                      return setIsbn(e.target.value);
+                      return setAuthor(e.target.value);
                     }}
                   />
-                </div>
-                <SearchSubtitle title={props.title} setIsbn={setIsbn} />
-                <div className="grid grid-cols-5 gap-2 mt-4">
-                  <div className="col-span-2 pt-1 text-xl text-center">
-                    Possession
-                  </div>
-                  <div className="col-span-3 pt-2 pl-2">
-                    <input
-                      type="checkbox"
-                      className="scale-150"
-                      checked={possession}
-                      onChange={() => setPossession(!possession)}
-                    />
-                  </div>
                 </div>
                 <div className="flex justify-center mt-4">
                   <div className="w-32 p-2">
@@ -163,7 +121,7 @@ export const AddSubtitle = (props: Props) => {
                       block
                       size="large"
                       icon={<IconPlus />}
-                      onClick={() => handleAdd()}
+                      onClick={() => handleAdd(props.uuid)}
                     >
                       Add
                     </Button>
