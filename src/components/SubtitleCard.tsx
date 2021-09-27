@@ -4,9 +4,9 @@ import { Button, IconSave, IconTrash2, IconX } from "@supabase/ui";
 import Image from "next/image";
 import noImage from "public/no_image.png";
 import { Fragment, useCallback, useState } from "react";
+import { subtitle } from "src/components/SubtitleList";
 import { Title } from "src/components/TitleList";
 import { client } from "src/libs/supabase";
-import { subtitle } from "src/pages/title";
 
 type Props = {
   subtitle: subtitle;
@@ -43,7 +43,7 @@ export const SubtitleCard = (props: Props) => {
     title.image_url = props.subtitle.image_url;
     const { error } = await client.from("manga_title").upsert(title);
     if (error) {
-      alert(error);
+      alert("Failed: Set Thumbnail.");
     }
     closeModal();
   }, [props, closeModal]);
@@ -54,7 +54,7 @@ export const SubtitleCard = (props: Props) => {
       .delete()
       .eq("id", props.subtitle.id);
     if (error) {
-      alert(error);
+      alert("Failed: Remove Subtitle.");
     }
     props.getSubtitleList();
     closeModal();
@@ -94,7 +94,7 @@ export const SubtitleCard = (props: Props) => {
       possession: possession,
     });
     if (error) {
-      alert(error);
+      alert("Failed: Save Subtitle.");
     }
     props.getSubtitleList();
     closeModal();
