@@ -28,14 +28,14 @@ export const AddTitle = (props: Props) => {
   const handleAdd = useCallback(
     async (uuid: string) => {
       if (title == "") {
-        alert("Input title.");
+        alert("Input Title.");
         return;
       }
       const { data, error } = await client
         .from("manga_title")
         .insert([{ user_id: uuid, title: title, author: author }]);
       if (error) {
-        alert(error);
+        alert("Failed: Add Title.");
       } else {
         if (data) {
           props.getTitleList();
