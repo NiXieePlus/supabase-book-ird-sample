@@ -1,4 +1,5 @@
 import { Auth, Button, IconLogOut } from "@supabase/ui";
+import { EditProfile } from "src/components/EditProfile";
 import { Footer } from "src/components/Footer";
 import { Header } from "src/components/Header";
 import { LayoutErrorBoundary } from "src/layout/LayoutErrorBoundary";
@@ -19,6 +20,9 @@ export const AuthLayout = (props: Props) => {
           <LayoutErrorBoundary>
             {user ? (
               <div>
+                <div className="flex justify-end mt-4">
+                  <EditProfile user={user} />
+                </div>
                 <div>{props.children}</div>
                 <div className="flex justify-end mx-2 my-4">
                   <Button

@@ -12,6 +12,14 @@ if (!SUPABASE_KEY) {
 
 export const client = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+export const getProfile = async () => {
+  const { data, error } = await client.from("profile").select("*");
+  if (!error && data) {
+    return data[0];
+  }
+  return null;
+};
+
 export const getTitles = async () => {
   const { data, error } = await client
     .from("manga_title")
