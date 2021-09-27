@@ -61,7 +61,7 @@ export const AddSubtitle = (props: Props) => {
       },
     ]);
     if (error) {
-      alert(error);
+      alert("Failed: Add Subtitle.");
     } else {
       if (data) {
         props.getSubtitleList();

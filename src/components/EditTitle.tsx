@@ -28,7 +28,7 @@ export const EditTitle = (props: Props) => {
 
   const handleSave = useCallback(async () => {
     if (title == "") {
-      alert("Input title.");
+      alert("Input Title.");
       return;
     }
     const { error } = await client.from("manga_title").upsert([
@@ -41,7 +41,7 @@ export const EditTitle = (props: Props) => {
       },
     ]);
     if (error) {
-      alert(error);
+      alert("Failed: Save Title.");
     } else {
       props.getSubtitleList();
       closeModal();
@@ -54,14 +54,14 @@ export const EditTitle = (props: Props) => {
       .delete()
       .eq("title_id", props.title.id);
     if (error) {
-      alert(error);
+      alert("Failed: Remove Title.");
     }
     ({ error } = await client
       .from("manga_title")
       .delete()
       .eq("id", props.title.id));
     if (error) {
-      alert(error);
+      alert("Failed: Remove Title.");
     }
     router.push("/");
   }, [props, router]);
