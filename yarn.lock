@@ -62,14 +62,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/types@7.15.0":
-  version "7.15.0"
-  resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.15.0.tgz#61af11f2286c4e9c69ca8deb5f4375a73c72dcbd"
-  integrity sha512-OBvfqnllOIdX4ojTHpwZbpvz4j3EWyjkZEdmjH0/cgsd6QOdSgU8rLSk6ard/pcW7rlmjdVSX/AWOaORR1uNOQ==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
-"@babel/runtime@^7.12.5":
+"@babel/runtime@^7.10.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10":
   version "7.15.4"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.15.4.tgz#fd17d16bfdf878e6dd02d19753a39fa8a8d9c84a"
   integrity sha512-99catp6bHCaxr4sJ/DbTGgHS4+Rs2RVd2g7iOap6SLGPDknRK9ztKNsE/Fg6QhSeh1FGE5f6gHGQmvvn3I3xhw==
@@ -246,7 +239,7 @@
     source-map "0.8.0-beta.0"
     stacktrace-parser "0.1.10"
     strip-ansi "6.0.0"
-    
+
 "@next/react-refresh-utils@11.1.2":
   version "11.1.2"
   resolved "https://registry.yarnpkg.com/@next/react-refresh-utils/-/react-refresh-utils-11.1.2.tgz#44ea40d8e773e4b77bad85e24f6ac041d5e4b4a5"
@@ -3149,7 +3142,7 @@ raw-body@2.4.1:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-react-avatar@^3.10.0:
+react-avatar@3.10.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/react-avatar/-/react-avatar-3.10.0.tgz#d8801aef167129fc87bdade82c0f7f5bfb064bf2"
   integrity sha512-FB20OZIAJif0WNzGy4PwT5Nca4rekrYWiswBofuGAa5FKpRrFbJKY69267dRXbFqIYQrA/OxNB/TjhnmP2gsEQ==
