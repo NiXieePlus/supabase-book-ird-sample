@@ -1,6 +1,6 @@
 # Next.jsではじめるSupabase
 
-[インプレスR&D](https://www.impressrd.jp/)から出版されている書籍「[Next.jsではじめるSupabase](https://nextpublishing.jp/book/14025.html)」のサンプルコードリポジトリです。  
+[インプレスR&D](https://www.impressrd.jp/)の技術の泉シリーズより出版されている書籍「[Next.jsではじめるSupabase](https://nextpublishing.jp/book/14025.html)」のサンプルコードリポジトリです。  
 本書は、[技術書典11](https://techbookfest.org/)で頒布した書籍「[Next.jsではじめるSupabase](https://techbookfest.org/product/5379695388393472?productVariantID=4808144628744192)」の商業化版です。  
 ※技術書典版のサンプルコードは[こちら](https://github.com/NiXieePlus/supabase-manga-list-sample)です。
 
