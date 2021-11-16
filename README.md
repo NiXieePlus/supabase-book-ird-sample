@@ -11,8 +11,12 @@
 - 電子版
   - [Amazon](https://www.amazon.co.jp/gp/product/B09LM3DCY3/ref=as_li_tf_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=B09LM3DCY3&linkCode=as2&tag=impressrd-1-22)
   - [楽天ブックス](https://books.rakuten.co.jp/rk/17e1a7ba2d253ec5b9d5c2e611ac9987/?l-id=search-c-item-text-01)
+  - [Apple Books](https://books.apple.com/jp/book/next-js%E3%81%A7%E3%81%AF%E3%81%98%E3%82%81%E3%82%8Bsupabase/id1594800886?ign-itscg=30200&ign-itsct=books_box_link)
   - [紀伊國屋書店](https://www.kinokuniya.co.jp/f/dsg-08-EK-1086812)
   - [Google Play](https://play.google.com/store/books/details/Next_js%E3%81%A7%E3%81%AF%E3%81%98%E3%82%81%E3%82%8BSupabase?id=aqpNEAAAQBAJ)
+  - [honto](https://honto.jp/ebook/pd_31337708.html)
+  - [Reader Store](https://ebookstore.sony.jp/item/LT000156324001369804/)
+  - [BOOK☆WALKER](https://bookwalker.jp/de92ec02d5-3457-4f59-b524-c24d0e6280f4/)
 - 印刷版
   - [Amazon](https://www.amazon.co.jp/gp/product/4295600113/ref=as_li_tf_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=4295600113&linkCode=as2&tag=impressrd-1-22)
   - [honto](https://honto.jp/netstore/pd-book_31333987.html)
